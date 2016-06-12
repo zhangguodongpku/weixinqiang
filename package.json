@@ -1,0 +1,27 @@
+{
+  "name": "weixinqiang",
+  "version": "1.0.0",
+  "description": "简易微信墙",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "微信墙"
+  ],
+  "author": "Paul",
+  "license": "ISC",
+  "dependencies": {
+	"body-parser": "^1.15.0",
+	"express-session": "^1.13.0",
+	"mysql": "^2.10.2",
+    "events": "^1.1.0",
+    "express": "^4.13.4",
+    "later": "^1.2.0",
+    "qs": "^6.2.0",
+    "request": "^2.72.0",
+    "socket.io": "^1.4.6",
+	"tmpl": "^1.0.4",
+	"xml2js": "^0.4.16"
+  }
+}

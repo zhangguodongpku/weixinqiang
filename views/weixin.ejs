@@ -1,0 +1,79 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="微信墙" content="微信墙聊天界面">
+<script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="/socket.io.js"></script>
+<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+<title>微信墙</title>
+</head>
+
+<body ng-app="wxq" ng-controller="wxqCtrl">
+<div class="panel panel-primary" style="position: absolute; top: 46%;left: 50%; transform: translate(-50%, -50%); width: 60%; height: 80%;">
+	<div class="panel-heading">
+		<h3 class="panel-title">微信墙</h3>
+	</div>
+	<div class="panel-body">
+		<div id="msgs" class="content-section-b" style="height: 60%; border:1px solid green; overflow-y:scroll; padding-bottom: 10%;">
+			<ul class="list-group">
+			<li class="list-group-item" ng-repeat="message in messages track by $index"><img src="{{message.img}}" height="32" width="32">{{message.user}}
+				&nbsp;&nbsp;{{message.time}}<br><span style="font-size: 20">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{message.msg}}</span></li>
+			</ul>
+		</div>
+		<input id="sendMsg" type="text" class="form-control" name="msgInput" placeholder="发送信息" style="margin-top: 3%;" ng-model="msg" ng-keypress="enter($event)"/>
+		<button class="btn btn-default pull-right" id="sendButton" style="margin-top: 3%; width: 20%;" ng-click="sendMsg()">发送</button>
+	</div>
+</div>
+</body>
+
+<script>
+var app = angular.module("wxq", []);
+app.controller("wxqCtrl", function($scope){
+	var msgs = [];
+	var socket = io.connect("/");
+	
+	socket.emit("getAllMsgs");
+	socket.on("allMsgs", function(allMsgs){
+		msgs = allMsgs.slice();
+		$scope.$apply(function() {
+			$scope.messages = msgs;
+			toBottom();
+		});
+	});
+	
+	socket.on("newClient", function(msg){
+		msgs.push(msg);
+		$scope.$apply(function() {
+			$scope.messages = msgs;
+			toBottom();
+		});
+	});
+	socket.on("newMsg", function(msg){
+		msgs.push(msg);
+		$scope.$apply(function() {
+			$scope.messages = msgs;
+		});
+	});
+	
+	$scope.sendMsg = function () {
+		socket.emit("sendMsg", $scope.msg);
+		toBottom();
+	};
+	$scope.enter = function(event){
+		if(event.keyCode == 13){
+			socket.emit("sendMsg", $scope.msg);
+			toBottom();
+		}
+	}
+	
+	function toBottom(){
+		document.getElementById("msgs").scrollTop = document.getElementById("msgs").scrollHeight;
+		document.getElementById("sendMsg").value = "";
+		$scope.msg = "";
+	}
+});
+</script>
+
+</html>
